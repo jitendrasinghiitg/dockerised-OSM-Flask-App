@@ -6,7 +6,7 @@ Postcode data has been taken from:
 
 * [GeoNames](http://download.geonames.org/export/zip/)
 
-##Demo
+## Demo
 
 <p align="center">
    <img src="https://github.com/jitendrasinghiitg/dockerised-OSM-Flask-App/raw/master/app/static/demo.gif" width="800">
