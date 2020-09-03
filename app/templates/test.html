@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>	
+	<head>
+		<title>Live Search Ajax Demo</title>
+		<meta charset="utf-8">
+		<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+		<link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/css/bootstrap-select.min.css" />
+		
+		 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />	 	
+	  	<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+		<script>
+
+			function serchresultclick(txt){
+			var vec=txt.split(/(\s+)/);
+			lon=vec.pop();
+			vec.pop();
+			lat=vec.pop();
+
+			earth_div.flyTo([lat, lon], 14);
+
+ 			console.log("lat:"+lat+" lon:"+lon)
+
+			}
+			    
+			function liveSearch(value){
+				value = value.trim(); // remove any spaces around the text
+				
+				if(value != ""){ // don't make requests with an empty string
+					$.ajax({type: "POST",
+						url: "{{ url_for('search_data_apps.search') }}",
+						data:JSON.stringify({textSearch: value}),
+						dataType: "json",
+						contentType:"application/json",
+						success: function(data){
+							var res = "";							
+							// create the html with results
+							for(i in data.results){
+								res += "<a onclick=\"serchresultclick($(this).text())\">"+data.results[i][0]+" "+"<font color=#808080>"+data.results[i][1]+"</font>"+" "+"<font color=#C0C0C0>"+data.results[i][3]+"</font>"+" "+"<font style=\"font-size:0px\" color=#808080>"+data.results[i][4]+"</font>"+" "+"<font style=\"font-size:0px\"color=#808080>"+data.results[i][5]+"</font>"+"</a>";
+							}
+
+							$("#results").html(res);
+						
+						},
+					error: function(error){
+                						console.log(error);
+           					 }
+						
+					});
+				}
+				else{
+					$("#results").html("Please enter a PostCode"); // set the results empty in case of empty string
+				}
+			}
+		</script>
+<style>
+.body {
+    background: #bbb;
+    text-align: center;
+}
+.dropdown {
+    position: absolute;
+    display: inline-block;
+    text-align: center;
+    width: 20%;
+    margin: 0 auto; left: 0; right:0;
+	top:20px;
+	z-index:999;
+    			
+}
+
+.results {
+    border-radius: 25px;	
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    text-align: center;	
+    width: 20%;
+    margin: 0 auto;
+    overflow: auto;
+    max-height: 400px;
+    			
+}
+
+.results a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    width: 90%;
+    margin: 0 auto;
+    overflow: auto;		
+}
+
+.earth_div{top: 0px; right: 0; bottom: 0; left: 0;
+                 background-color: #000; position: absolute !important; }
+
+.results a:hover {background-color: #ddd; }
+
+.dropdown:hover .results {
+    display: block; width:90%; margin: 0 auto; left: 0; right:0;
+}
+.map-full{width:100%;float:left; position:relative; height:100vh;}
+</style>
+	</head>
+	<body >	
+<div class="map-full">	
+		<div class="dropdown" >
+  			<input type="text" onkeyup="liveSearch(this.value)" style="text-align:center;width: 90%;">
+  			<div id=results class="results" >  </div>
+		</div>
+		<div id="earth_div" class="earth_div" ></div>
+</div>
+		<script>
+		var options = {atmosphere: true, center: [0, 0], zoom:3,
+            maxAltitude: 21000000};
+            var earth_div = new L.map('earth_div', options);
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            minZoom: 0,
+            
+            attribution: 'NASA'
+            }).addTo(earth_div);
+	    L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-hybrid/{z}/{x}/{y}.{ext}', {
+	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+	subdomains: 'abcd',
+	minZoom: 0,
+	maxZoom:18,
+	ext: 'png'
+}).addTo(earth_div);
+</script>
+	</body>
+</html>
+
+

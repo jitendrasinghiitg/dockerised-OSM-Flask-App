@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  osm_python_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: osm/web:latest
+    container_name: "osm_python"
+    environment:
+      - DB_OSM=mongodb://osm_mongodb:27017
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost/api/v1/upload_data/upload_postcode_data" ]
+      interval: "60s"
+      timeout: "3s"
+      retries: 3
+    ports:
+      - "5000:80"
+    working_dir: /app
+    links:
+      - mongodb_osm
+
+  mongodb_osm:
+    image: mongo:latest
+    container_name: "osm_mongodb"
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/data/db/mongoLogs
+    volumes:
+      - /data/db:/data/db
+    command: mongod --logpath=/dev/null
