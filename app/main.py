@@ -15,7 +15,7 @@ def welcome():
 
 @app.route('/')
 def index():
-    return render_template("test.html")
+    return render_template("map.html")
 
 
 if __name__ == "__main__":
